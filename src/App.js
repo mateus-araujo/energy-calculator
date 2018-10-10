@@ -6,6 +6,7 @@ import {
 } from 'reactstrap'
 
 import Header from './components/Header'
+import ArCondicionado from './equipments/ArCondicionado'
 import Geladeira from './equipments/Geladeira'
 import NotFound from './equipments/NotFound'
 
@@ -66,7 +67,9 @@ class App extends Component {
                   </Form>
                   : this.state.selectedEquip === 'Geladeira' ?
                     <Geladeira />
-                    : <NotFound />
+                    : this.state.selectedEquip === 'Ar condicionado' ?
+                      <ArCondicionado />
+                      : <NotFound />
                 }
               </CardText>
             </CardBody>
