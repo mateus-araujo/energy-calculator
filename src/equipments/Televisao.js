@@ -5,7 +5,7 @@ import {
   Form, FormGroup, Input, Label, Row
 } from 'reactstrap'
 
-class ArCondicionado extends Component {
+class Televisao extends Component {
   state = {
     tempo_uso: 6,
     potencia: 1000,
@@ -13,9 +13,19 @@ class ArCondicionado extends Component {
     selectedProcel: '',
     dropdownProcel: false,
     aparelhos: [
-      { descricao: '7500 Btu\'s', potencia: 650 },
-      { descricao: '9000 Btu\'s', potencia: 950 },
-      { descricao: '12000 Btu\'s', potencia: 1200 }
+      { descricao: 'TV LED 32', potencia: 95 },
+      { descricao: 'TV LED 46', potencia: 165 },
+      { descricao: 'TV LED 55', potencia: 225 },
+      { descricao: 'TV LCD 22', potencia: 56 },
+      { descricao: 'TV LCD 32', potencia: 122 },
+      { descricao: 'TV LCD 37', potencia: 140 },
+      { descricao: 'TV LCD 42', potencia: 210 },
+      { descricao: 'TV PLASMA 42', potencia: 280 },
+      { descricao: 'TV PLASMA 50', potencia: 457 },
+      { descricao: 'TV TUBO 14', potencia: 55 },
+      { descricao: 'TV TUBO 20', potencia: 71 },
+      { descricao: 'TV TUBO 21', potencia: 73 },
+      { descricao: 'TV TUBO 29', potencia: 95 },
     ],
     selectedAparelho: '',
     dropdownAparelhos: false,
@@ -58,7 +68,7 @@ class ArCondicionado extends Component {
     return (
       <Fragment>
         {!this.state.calcular ?
-          <div style={{ fontWeight: 'bold' }}>Selecionado: Ar condicionado</div>
+          <div style={{ fontWeight: 'bold' }}>Selecionado: Televisão</div>
           : null
         }
 
@@ -123,7 +133,7 @@ class ArCondicionado extends Component {
                     {this.state.aparelhos.map(aparelho =>
                       <DropdownItem
                         key={aparelho.descricao}
-                        onClick={() => this.setState({ 
+                        onClick={() => this.setState({
                           selectedAparelho: aparelho.descricao,
                           potencia: aparelho.potencia
                         })}
@@ -143,7 +153,7 @@ class ArCondicionado extends Component {
           :
           <Container style={{ marginBottom: 30 }}>
             <Row>
-              <Col style={{ fontWeight: 'bold', marginBottom: 30 }}>Seu ar condicionado consome:</Col>
+              <Col style={{ fontWeight: 'bold', marginBottom: 30 }}>Sua televisão consome:</Col>
             </Row>
             <Row>
               <Col>Por dia: </Col>
@@ -172,4 +182,4 @@ class ArCondicionado extends Component {
   }
 }
 
-export default ArCondicionado
+export default Televisao

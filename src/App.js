@@ -8,6 +8,7 @@ import {
 import Header from './components/Header'
 import ArCondicionado from './equipments/ArCondicionado'
 import Geladeira from './equipments/Geladeira'
+import Televisao from './equipments/Televisao'
 import NotFound from './equipments/NotFound'
 
 // import logo from './logo.svg'
@@ -15,7 +16,7 @@ import './App.css'
 
 class App extends Component {
   state = {
-    equipments: ['Ar condicionado', 'Geladeira', 'TV'],
+    equipments: ['Ar condicionado', 'Geladeira', 'Televisão'],
     selectedEquip: '',
     dropdownOpen: false,
     comecar: false
@@ -51,6 +52,7 @@ class App extends Component {
                           <DropdownMenu>
                             {this.state.equipments.map(equipment =>
                               <DropdownItem
+                                key={equipment}
                                 onClick={() => this.setState({ selectedEquip: equipment })}
                               >
                                 {equipment}
@@ -69,7 +71,9 @@ class App extends Component {
                     <Geladeira />
                     : this.state.selectedEquip === 'Ar condicionado' ?
                       <ArCondicionado />
-                      : <NotFound />
+                      : this.state.selectedEquip === 'Televisão' ?
+                        <Televisao />
+                        : <NotFound />
                 }
               </CardText>
             </CardBody>

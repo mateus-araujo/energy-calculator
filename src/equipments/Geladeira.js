@@ -152,7 +152,7 @@ class Geladeira extends Component {
             </Row>
 
             <Row style={{ marginTop: 30 }}>
-              <Col>Tarifa: </Col>
+              <Col>Tarifa base: </Col>
               <Col style={{ color: 'red' }}>{this.state.tarifa + ' R$/kWh'}</Col>
             </Row>
           </Container>
