@@ -123,7 +123,7 @@ class ArCondicionado extends Component {
                     {this.state.aparelhos.map(aparelho =>
                       <DropdownItem
                         key={aparelho.descricao}
-                        onClick={() => this.setState({ 
+                        onClick={() => this.setState({
                           selectedAparelho: aparelho.descricao,
                           potencia: aparelho.potencia
                         })}
@@ -147,22 +147,30 @@ class ArCondicionado extends Component {
             </Row>
             <Row>
               <Col>Por dia: </Col>
-              <Col style={{ color: 'green' }}>{'R$ ' + this.state.resultadoPorDia.toFixed(2)}</Col>
+              <Col style={{ color: 'green' }}>
+                {'R$ ' + this.state.resultadoPorDia.toFixed(2).replace('.', ',')}
+              </Col>
             </Row>
 
             <Row>
               <Col>Por semana: </Col>
-              <Col style={{ color: 'green' }}>{'R$ ' + this.state.resultadoPorSemana.toFixed(2)}</Col>
+              <Col style={{ color: 'green' }}>
+                {'R$ ' + this.state.resultadoPorSemana.toFixed(2).replace('.', ',')}
+              </Col>
             </Row>
 
             <Row>
               <Col>Por mês: </Col>
-              <Col style={{ color: 'green' }}>{'R$ ' + this.state.resultadoPorMes.toFixed(2)}</Col>
+              <Col style={{ color: 'green' }}>
+                {'R$ ' + this.state.resultadoPorMes.toFixed(2).replace('.', ',')}
+              </Col>
             </Row>
 
             <Row style={{ marginTop: 30 }}>
               <Col>Tarifa base: </Col>
-              <Col style={{ color: 'red' }}>{this.state.tarifa + ' R$/kWh'}</Col>
+              <Col style={{ color: 'red' }}>
+                {this.state.tarifa.toFixed(2).replace('.', ',') + ' reais/kWh'}
+              </Col>
             </Row>
           </Container>
         }
