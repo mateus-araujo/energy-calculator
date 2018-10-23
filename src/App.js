@@ -28,12 +28,12 @@ class App extends Component {
 
     this.state.selectedEquip = this.state.equipments[0]
 
-    this.watcher()
+    this.getPosition()
   }
 
-  watcher = () => {
+  getPosition = () => {
     if ('geolocation' in navigator)
-      navigator.geolocation.watchPosition(
+      navigator.geolocation.getCurrentPosition(
         (position) => {
           const { coords } = position
 
