@@ -1,9 +1,11 @@
 import React, { Component, Fragment } from 'react'
 import {
-  Button, Container, Col,
+  Button, Col,
   Dropdown, DropdownItem, DropdownMenu, DropdownToggle,
-  Form, FormGroup, Input, Label, Row
+  Form, FormGroup, Input, Label
 } from 'reactstrap'
+
+import Result from './Result'
 
 class ArCondicionado extends Component {
   state = {
@@ -65,6 +67,33 @@ class ArCondicionado extends Component {
         {!this.state.calcular ?
           <Form style={{ marginTop: 30, marginLeft: 10, marginRight: 10 }}>
             <FormGroup row>
+              <Label sm="7" xs="7">Aparelhos sugeridos:</Label>
+              <Col sm="5" xs="5">
+                <Dropdown
+                  isOpen={this.state.dropdownAparelhos}
+                  toggle={() => this.setState({ dropdownAparelhos: !this.state.dropdownAparelhos })}
+                >
+                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
+                    {this.state.selectedAparelho}
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    {this.state.aparelhos.map(aparelho =>
+                      <DropdownItem
+                        key={aparelho.descricao}
+                        onClick={() => this.setState({
+                          selectedAparelho: aparelho.descricao,
+                          potencia: aparelho.potencia
+                        })}
+                      >
+                        {aparelho.descricao}
+                      </DropdownItem>
+                    )}
+                  </DropdownMenu>
+                </Dropdown>
+              </Col>
+            </FormGroup>
+
+            <FormGroup row>
               <Label sm="7" xs="7">Tempo de uso (h): </Label>
               <Col sm="5" xs="5">
                 <Input
@@ -109,70 +138,18 @@ class ArCondicionado extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup row>
-              <Label sm="7" xs="7">Aparelhos sugeridos:</Label>
-              <Col sm="5" xs="5">
-                <Dropdown
-                  isOpen={this.state.dropdownAparelhos}
-                  toggle={() => this.setState({ dropdownAparelhos: !this.state.dropdownAparelhos })}
-                >
-                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
-                    {this.state.selectedAparelho}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {this.state.aparelhos.map(aparelho =>
-                      <DropdownItem
-                        key={aparelho.descricao}
-                        onClick={() => this.setState({
-                          selectedAparelho: aparelho.descricao,
-                          potencia: aparelho.potencia
-                        })}
-                      >
-                        {aparelho.descricao}
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-              </Col>
-            </FormGroup>
-
             <FormGroup>
               <Button color="success" onClick={this.calcular.bind(this)}>Calcular</Button>
             </FormGroup>
           </Form>
           :
-          <Container style={{ marginBottom: 30 }}>
-            <Row>
-              <Col style={{ fontWeight: 'bold', marginBottom: 30 }}>Seu ar condicionado consome:</Col>
-            </Row>
-            <Row>
-              <Col>Por dia: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorDia.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>Por semana: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorSemana.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>Por mês: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorMes.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row style={{ marginTop: 30 }}>
-              <Col>Tarifa base: </Col>
-              <Col style={{ color: 'red' }}>
-                {this.state.tarifa.toFixed(2).replace('.', ',') + ' reais/kWh'}
-              </Col>
-            </Row>
-          </Container>
+          <Result
+            equipamento="Seu ar condicionado"
+            resultadoPorDia={this.state.resultadoPorDia}
+            resultadoPorSemana={this.state.resultadoPorSemana}
+            resultadoPorMes={this.state.resultadoPorMes}
+            tarifa={this.state.tarifa}
+          />
         }
         <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
       </Fragment>

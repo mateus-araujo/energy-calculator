@@ -1,9 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import {
-  Button, Container, Col,
+  Button, Col,
   Dropdown, DropdownItem, DropdownMenu, DropdownToggle,
-  Form, FormGroup, Input, Label, Row
+  Form, FormGroup, Input, Label,
 } from 'reactstrap'
+
+import Result from './Result'
+import api from '../services/api'
 
 class Televisao extends Component {
   state = {
@@ -44,7 +47,7 @@ class Televisao extends Component {
     this.state.potencia = this.state.aparelhos[0].potencia
   }
 
-  calcular() {
+  async calcular() {
     const { potencia, tarifa, tempo_uso } = this.state
     let resultadoPorDia, resultadoPorSemana, resultadoPorMes
 
@@ -52,12 +55,29 @@ class Televisao extends Component {
     resultadoPorSemana = resultadoPorDia * 7
     resultadoPorMes = resultadoPorDia * 30
 
-    this.setState({
+    await this.setState({
       resultadoPorDia,
       resultadoPorSemana,
       resultadoPorMes,
       calcular: !this.state.calcular
     })
+
+    this.createSearch()
+  }
+
+  createSearch = async () => {
+    const { selectedAparelho, selectedProcel, tempo_uso, potencia, tarifa, resultadoPorMes } = this.state
+
+    await api.post('/search', {
+      equip: 'Televisão',
+      equipModel: selectedAparelho,
+      procelSeal: selectedProcel,
+      useTime: tempo_uso,
+      wattsPower: potencia,
+      tax: tarifa,
+      costPerMonth: resultadoPorMes
+    })
+      .then(response => console.log(response.data))
   }
 
   onBack() {
@@ -74,6 +94,33 @@ class Televisao extends Component {
 
         {!this.state.calcular ?
           <Form style={{ marginTop: 30, marginLeft: 10, marginRight: 10 }}>
+            <FormGroup row>
+              <Label sm="7" xs="7">Aparelhos sugeridos:</Label>
+              <Col sm="5" xs="5">
+                <Dropdown
+                  isOpen={this.state.dropdownAparelhos}
+                  toggle={() => this.setState({ dropdownAparelhos: !this.state.dropdownAparelhos })}
+                >
+                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
+                    {this.state.selectedAparelho}
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    {this.state.aparelhos.map(aparelho =>
+                      <DropdownItem
+                        key={aparelho.descricao}
+                        onClick={() => this.setState({
+                          selectedAparelho: aparelho.descricao,
+                          potencia: aparelho.potencia
+                        })}
+                      >
+                        {aparelho.descricao}
+                      </DropdownItem>
+                    )}
+                  </DropdownMenu>
+                </Dropdown>
+              </Col>
+            </FormGroup>
+
             <FormGroup row>
               <Label sm="7" xs="7">Tempo de uso (h): </Label>
               <Col sm="5" xs="5">
@@ -119,70 +166,18 @@ class Televisao extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup row>
-              <Label sm="7" xs="7">Aparelhos sugeridos:</Label>
-              <Col sm="5" xs="5">
-                <Dropdown
-                  isOpen={this.state.dropdownAparelhos}
-                  toggle={() => this.setState({ dropdownAparelhos: !this.state.dropdownAparelhos })}
-                >
-                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
-                    {this.state.selectedAparelho}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {this.state.aparelhos.map(aparelho =>
-                      <DropdownItem
-                        key={aparelho.descricao}
-                        onClick={() => this.setState({
-                          selectedAparelho: aparelho.descricao,
-                          potencia: aparelho.potencia
-                        })}
-                      >
-                        {aparelho.descricao}
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-              </Col>
-            </FormGroup>
-
             <FormGroup>
               <Button color="success" onClick={this.calcular.bind(this)}>Calcular</Button>
             </FormGroup>
           </Form>
           :
-          <Container style={{ marginBottom: 30 }}>
-            <Row>
-              <Col style={{ fontWeight: 'bold', marginBottom: 30 }}>Sua televisão consome:</Col>
-            </Row>
-            <Row>
-              <Col>Por dia: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorDia.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>Por semana: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorSemana.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>Por mês: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorMes.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row style={{ marginTop: 30 }}>
-              <Col>Tarifa base: </Col>
-              <Col style={{ color: 'red' }}>
-                {this.state.tarifa.toFixed(2).replace('.', ',') + ' reais/kWh'}
-              </Col>
-            </Row>
-          </Container>
+          <Result
+            equipamento="Sua televisão"
+            resultadoPorDia={this.state.resultadoPorDia}
+            resultadoPorSemana={this.state.resultadoPorSemana}
+            resultadoPorMes={this.state.resultadoPorMes}
+            tarifa={this.state.tarifa}
+          />
         }
         <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
       </Fragment>

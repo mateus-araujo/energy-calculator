@@ -1,9 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import {
-  Button, Container, Col,
+  Button, Col,
   Dropdown, DropdownItem, DropdownMenu, DropdownToggle,
-  Form, FormGroup, Input, Label, Row
+  Form, FormGroup, Input, Label
 } from 'reactstrap'
+
+import Result from './Result'
+import api from '../services/api'
 
 class Geladeira extends Component {
   state = {
@@ -29,7 +32,7 @@ class Geladeira extends Component {
     this.state.selectedQtdAberturas = this.state.qtdAberturasPorDia[0]
   }
 
-  calcular() {
+  async calcular() {
     const { potencia } = this.state
     let resultadoPorDia, resultadoPorSemana, resultadoPorMes
 
@@ -37,12 +40,31 @@ class Geladeira extends Component {
     resultadoPorSemana = resultadoPorDia * 7
     resultadoPorMes = resultadoPorDia * 30
 
-    this.setState({
+    await this.setState({
       resultadoPorDia,
       resultadoPorSemana,
       resultadoPorMes,
       calcular: !this.state.calcular
     })
+
+    this.createSearch()
+  }
+
+  createSearch = async () => {
+    const { litros, selectedQtdAberturas, selectedProcel, potencia, tarifa, resultadoPorMes } = this.state
+
+    await api.post('/search', {
+      equip: 'Geladeira',
+      equipModel: 'not_provided',
+      capacityLiters: litros,
+      refrigeratorOpenTimes: selectedQtdAberturas,
+      procelSeal: selectedProcel,
+      useTime: 24,
+      wattsPower: potencia,
+      tax: tarifa,
+      costPerMonth: resultadoPorMes
+    })
+      .then(response => console.log(response.data))
   }
 
   onBack() {
@@ -132,38 +154,13 @@ class Geladeira extends Component {
             </FormGroup>
           </Form>
           :
-          <Container style={{ marginBottom: 30 }}>
-            <Row>
-              <Col style={{ fontWeight: 'bold', marginBottom: 30 }}>Sua geladeira consome:</Col>
-            </Row>
-            <Row>
-              <Col>Por dia: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorDia.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>Por semana: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorSemana.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>Por mês: </Col>
-              <Col style={{ color: 'green' }}>
-                {'R$ ' + this.state.resultadoPorMes.toFixed(2).replace('.', ',')}
-              </Col>
-            </Row>
-
-            <Row style={{ marginTop: 30 }}>
-              <Col>Tarifa base: </Col>
-              <Col style={{ color: 'red' }}>
-                {this.state.tarifa.toFixed(2).replace('.', ',') + ' reais/kWh'}
-              </Col>
-            </Row>
-          </Container>
+          <Result
+            equipamento="Sua geladeira"
+            resultadoPorDia={this.state.resultadoPorDia}
+            resultadoPorSemana={this.state.resultadoPorSemana}
+            resultadoPorMes={this.state.resultadoPorMes}
+            tarifa={this.state.tarifa}
+          />
         }
         <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
       </Fragment>
