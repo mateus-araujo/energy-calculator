@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import {
   Button, Col,
   Dropdown, DropdownItem, DropdownMenu, DropdownToggle,
-  Form, FormGroup, Input, Label
+  Form, FormGroup, Input, Label,
 } from 'reactstrap'
 
 import Result from './Result'
@@ -11,35 +11,34 @@ import ModalSuggestion from '../components/ModalSuggestion'
 
 const inlineSize = 120
 
-class Geladeira extends Component {
+class OtherEquip extends Component {
   state = {
-    litros: '',
-    potencia: 250,
+    nome: '',
+    modelo: '',
+    tempo_uso: 6,
+    potencia: 100,
     procel: ['A', 'B', 'C', 'D', 'E', 'Não sei'],
     selectedProcel: '',
     dropdownProcel: false,
-    qtdAberturasPorDia: ['1 vez', '2 a 3 vezes', '5 a 8 vezes', '8 a 13 vezes', '13 a 20 vezes', '+ 20 vezes'],
-    selectedQtdAberturas: '',
-    dropdownQtdAberturas: false,
     calcular: false,
     resultadoPorDia: '',
     resultadoPorSemana: '',
     resultadoPorMes: '',
-    tarifa: 0.304445
+    tarifa: 0.304445,
+    modal: false
   }
 
   constructor(props) {
     super(props)
 
     this.state.selectedProcel = this.state.procel[0]
-    this.state.selectedQtdAberturas = this.state.qtdAberturasPorDia[0]
   }
 
   async calcular() {
-    const { potencia } = this.state
+    const { potencia, tarifa, tempo_uso } = this.state
     let resultadoPorDia, resultadoPorSemana, resultadoPorMes
 
-    resultadoPorDia = potencia / 1000 * 24 * this.state.tarifa
+    resultadoPorDia = potencia / 1000 * tempo_uso * tarifa
     resultadoPorSemana = resultadoPorDia * 7
     resultadoPorMes = resultadoPorDia * 30
 
@@ -54,15 +53,13 @@ class Geladeira extends Component {
   }
 
   createSearch = async () => {
-    const { litros, selectedQtdAberturas, selectedProcel, potencia, tarifa, resultadoPorMes } = this.state
+    const { nome, modelo, selectedProcel, tempo_uso, potencia, tarifa, resultadoPorMes } = this.state
 
     await api.post('/search', {
-      equip: 'Geladeira',
-      equipModel: 'not_provided',
-      capacityLiters: litros,
-      refrigeratorOpenTimes: selectedQtdAberturas,
+      equip: nome,
+      equipModel: modelo === '' ? 'not_provided': modelo,
       procelSeal: selectedProcel,
-      useTime: 24,
+      useTime: tempo_uso,
       wattsPower: potencia,
       tax: tarifa,
       costPerMonth: resultadoPorMes
@@ -81,22 +78,46 @@ class Geladeira extends Component {
     return (
       <Fragment>
         {!this.state.calcular ?
-          <div style={{ fontWeight: 'bold' }}>Selecionado: Geladeira</div>
+          <div style={{ fontWeight: 'bold' }}>Selecionado: Outro equipamento</div>
           : null
         }
 
         {!this.state.calcular ?
           <Form style={{ marginTop: 30, marginLeft: 10, marginRight: 10 }}>
             <FormGroup row>
-              <Label size="sm" sm="7" xs="7">Capacidade em litros: </Label>
+              <Label size="sm" sm="7" xs="7">Nome: </Label>
               <Col sm="5" xs="5">
                 <Input
                   bsSize="sm"
                   style={{ inlineSize }}
-                  placeholder="400"
+                  onChange={e => this.setState({ nome: e.target.value })}
+                  value={this.state.nome}
+                />
+              </Col>
+            </FormGroup>
+
+            <FormGroup row>
+              <Label size="sm" sm="7" xs="7">Modelo: </Label>
+              <Col sm="5" xs="5">
+                <Input
+                  bsSize="sm"
+                  style={{ inlineSize }}
+                  placeholder="Opcional"
+                  onChange={e => this.setState({ modelo: e.target.value })}
+                  value={this.state.modelo}
+                />
+              </Col>
+            </FormGroup>
+
+            <FormGroup row>
+              <Label size="sm" sm="7" xs="7">Tempo de uso (h): </Label>
+              <Col sm="5" xs="5">
+                <Input
+                  bsSize="sm"
+                  style={{ inlineSize }}
                   type="number"
-                  onChange={e => this.setState({ litros: e.target.value })}
-                  value={this.state.litros}
+                  onChange={e => this.setState({ tempo_uso: e.target.value })}
+                  value={this.state.tempo_uso}
                 />
               </Col>
             </FormGroup>
@@ -128,35 +149,9 @@ class Geladeira extends Component {
                   <DropdownMenu>
                     {this.state.procel.map(selo =>
                       <DropdownItem
-                        key={selo}
                         onClick={() => this.setState({ selectedProcel: selo })}
                       >
                         {selo}
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-              </Col>
-            </FormGroup>
-
-            <FormGroup row style={{ alignItems: 'center' }}>
-              <Label size="sm" sm="7" xs="7">Quantas vezes você abre e fecha a geladeira durante o dia?</Label>
-              <Col sm="5" xs="5">
-                <Dropdown
-                  size="sm"
-                  isOpen={this.state.dropdownQtdAberturas}
-                  toggle={() => this.setState({ dropdownQtdAberturas: !this.state.dropdownQtdAberturas })}
-                >
-                  <DropdownToggle color="info" caret style={{ inlineSize }}>
-                    {this.state.selectedQtdAberturas}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {this.state.qtdAberturasPorDia.map(qtd =>
-                      <DropdownItem
-                        key={qtd}
-                        onClick={() => this.setState({ selectedQtdAberturas: qtd })}
-                      >
-                        {qtd}
                       </DropdownItem>
                     )}
                   </DropdownMenu>
@@ -170,7 +165,7 @@ class Geladeira extends Component {
           </Form>
           :
           <Result
-            equipamento="Sua geladeira"
+            equipamento="Sua televisão"
             resultadoPorDia={this.state.resultadoPorDia}
             resultadoPorSemana={this.state.resultadoPorSemana}
             resultadoPorMes={this.state.resultadoPorMes}
@@ -198,4 +193,4 @@ class Geladeira extends Component {
   }
 }
 
-export default Geladeira
+export default OtherEquip

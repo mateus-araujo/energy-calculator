@@ -7,6 +7,9 @@ import {
 
 import Result from './Result'
 import api from '../services/api'
+import ModalSuggestion from '../components/ModalSuggestion'
+
+const inlineSize = 120
 
 class Televisao extends Component {
   state = {
@@ -36,7 +39,8 @@ class Televisao extends Component {
     resultadoPorDia: '',
     resultadoPorSemana: '',
     resultadoPorMes: '',
-    tarifa: 0.304445
+    tarifa: 0.304445,
+    modal: false
   }
 
   constructor(props) {
@@ -77,11 +81,14 @@ class Televisao extends Component {
       tax: tarifa,
       costPerMonth: resultadoPorMes
     })
-      .then(response => console.log(response.data))
   }
 
   onBack() {
-    window.location.reload()
+    this.props.comecar()
+  }
+
+  toggleModal() {
+    this.setState({ modal: !this.state.modal })
   }
 
   render() {
@@ -95,13 +102,14 @@ class Televisao extends Component {
         {!this.state.calcular ?
           <Form style={{ marginTop: 30, marginLeft: 10, marginRight: 10 }}>
             <FormGroup row>
-              <Label sm="7" xs="7">Aparelhos sugeridos:</Label>
+              <Label size="sm" sm="7" xs="7">Aparelhos sugeridos:</Label>
               <Col sm="5" xs="5">
                 <Dropdown
+                  size="sm"
                   isOpen={this.state.dropdownAparelhos}
                   toggle={() => this.setState({ dropdownAparelhos: !this.state.dropdownAparelhos })}
                 >
-                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
+                  <DropdownToggle color="info" caret style={{ inlineSize }}>
                     {this.state.selectedAparelho}
                   </DropdownToggle>
                   <DropdownMenu>
@@ -122,9 +130,11 @@ class Televisao extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm="7" xs="7">Tempo de uso (h): </Label>
+              <Label size="sm" sm="7" xs="7">Tempo de uso (h): </Label>
               <Col sm="5" xs="5">
                 <Input
+                  bsSize="sm"
+                  style={{ inlineSize }}
                   type="number"
                   onChange={e => this.setState({ tempo_uso: e.target.value })}
                   value={this.state.tempo_uso}
@@ -133,9 +143,11 @@ class Televisao extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm="7" xs="7">Potência em W (watts): </Label>
+              <Label size="sm" sm="7" xs="7">Potência em W (watts): </Label>
               <Col sm="5" xs="5">
                 <Input
+                  bsSize="sm"
+                  style={{ inlineSize }}
                   type="number"
                   onChange={e => this.setState({ potencia: e.target.value })}
                   value={this.state.potencia}
@@ -144,13 +156,14 @@ class Televisao extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm="7" xs="7">Selo Procel: </Label>
+              <Label size="sm" sm="7" xs="7">Selo Procel: </Label>
               <Col sm="5" xs="5">
                 <Dropdown
+                  size="sm"
                   isOpen={this.state.dropdownProcel}
                   toggle={() => this.setState({ dropdownProcel: !this.state.dropdownProcel })}
                 >
-                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
+                  <DropdownToggle color="info" caret style={{ inlineSize }}>
                     {this.state.selectedProcel}
                   </DropdownToggle>
                   <DropdownMenu>
@@ -166,7 +179,7 @@ class Televisao extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup>
+            <FormGroup style={{ marginTop: 30 }}>
               <Button color="success" onClick={this.calcular.bind(this)}>Calcular</Button>
             </FormGroup>
           </Form>
@@ -179,7 +192,22 @@ class Televisao extends Component {
             tarifa={this.state.tarifa}
           />
         }
-        <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
+        <FormGroup row>
+          {this.state.calcular ?
+            <Col>
+              <Button
+                onClick={() => this.toggleModal()}
+                color="danger">Enviar sugestão
+              </Button>
+            </Col>
+            : null
+          }
+          <Col>
+            <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
+          </Col>
+        </FormGroup>
+
+        <ModalSuggestion modal={this.state.modal} toggleModal={this.toggleModal.bind(this)} />
       </Fragment>
     )
   }

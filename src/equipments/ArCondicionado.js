@@ -6,12 +6,16 @@ import {
 } from 'reactstrap'
 
 import Result from './Result'
+import api from '../services/api'
+import ModalSuggestion from '../components/ModalSuggestion'
+
+const inlineSize = 120
 
 class ArCondicionado extends Component {
   state = {
     tempo_uso: 6,
     potencia: 1000,
-    procel: ['A', 'B', 'C', 'D', 'E'],
+    procel: ['A', 'B', 'C', 'D', 'E', 'Não sei'],
     selectedProcel: '',
     dropdownProcel: false,
     aparelhos: [
@@ -25,7 +29,8 @@ class ArCondicionado extends Component {
     resultadoPorDia: '',
     resultadoPorSemana: '',
     resultadoPorMes: '',
-    tarifa: 0.304445
+    tarifa: 0.304445,
+    modal: false
   }
 
   constructor(props) {
@@ -50,10 +55,30 @@ class ArCondicionado extends Component {
       resultadoPorMes,
       calcular: !this.state.calcular
     })
+
+    this.createSearch()
+  }
+
+  createSearch = async () => {
+    const { selectedAparelho, selectedProcel, tempo_uso, potencia, tarifa, resultadoPorMes } = this.state
+
+    await api.post('/search', {
+      equip: 'Ar condicionado',
+      equipModel: selectedAparelho,
+      procelSeal: selectedProcel,
+      useTime: tempo_uso,
+      wattsPower: potencia,
+      tax: tarifa,
+      costPerMonth: resultadoPorMes
+    })
   }
 
   onBack() {
-    window.location.reload()
+    this.props.comecar()
+  }
+
+  toggleModal() {
+    this.setState({ modal: !this.state.modal })
   }
 
   render() {
@@ -67,13 +92,14 @@ class ArCondicionado extends Component {
         {!this.state.calcular ?
           <Form style={{ marginTop: 30, marginLeft: 10, marginRight: 10 }}>
             <FormGroup row>
-              <Label sm="7" xs="7">Aparelhos sugeridos:</Label>
+              <Label size="sm" sm="7" xs="7">Aparelhos sugeridos:</Label>
               <Col sm="5" xs="5">
                 <Dropdown
+                  size="sm"
                   isOpen={this.state.dropdownAparelhos}
                   toggle={() => this.setState({ dropdownAparelhos: !this.state.dropdownAparelhos })}
                 >
-                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
+                  <DropdownToggle color="info" caret style={{ inlineSize }}>
                     {this.state.selectedAparelho}
                   </DropdownToggle>
                   <DropdownMenu>
@@ -94,9 +120,11 @@ class ArCondicionado extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm="7" xs="7">Tempo de uso (h): </Label>
+              <Label size="sm" sm="7" xs="7">Tempo de uso (h): </Label>
               <Col sm="5" xs="5">
                 <Input
+                  bsSize="sm"
+                  style={{ inlineSize }}
                   type="number"
                   onChange={e => this.setState({ tempo_uso: e.target.value })}
                   value={this.state.tempo_uso}
@@ -105,9 +133,11 @@ class ArCondicionado extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm="7" xs="7">Potência em W (watts): </Label>
+              <Label size="sm" sm="7" xs="7">Potência em W (watts): </Label>
               <Col sm="5" xs="5">
                 <Input
+                  bsSize="sm"
+                  style={{ inlineSize }}
                   type="number"
                   onChange={e => this.setState({ potencia: e.target.value })}
                   value={this.state.potencia}
@@ -116,18 +146,20 @@ class ArCondicionado extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm="7" xs="7">Selo Procel: </Label>
+              <Label size="sm" sm="7" xs="7">Selo Procel: </Label>
               <Col sm="5" xs="5">
                 <Dropdown
+                  size="sm"
                   isOpen={this.state.dropdownProcel}
                   toggle={() => this.setState({ dropdownProcel: !this.state.dropdownProcel })}
                 >
-                  <DropdownToggle color="info" caret style={{ inlineSize: 150 }}>
+                  <DropdownToggle color="info" caret style={{ inlineSize }}>
                     {this.state.selectedProcel}
                   </DropdownToggle>
                   <DropdownMenu>
                     {this.state.procel.map(selo =>
                       <DropdownItem
+                        key={selo}
                         onClick={() => this.setState({ selectedProcel: selo })}
                       >
                         {selo}
@@ -138,7 +170,7 @@ class ArCondicionado extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup>
+            <FormGroup style={{ marginTop: 30 }}>
               <Button color="success" onClick={this.calcular.bind(this)}>Calcular</Button>
             </FormGroup>
           </Form>
@@ -151,7 +183,22 @@ class ArCondicionado extends Component {
             tarifa={this.state.tarifa}
           />
         }
-        <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
+        <FormGroup row>
+          {this.state.calcular ?
+            <Col>
+              <Button
+                onClick={() => this.toggleModal()}
+                color="danger">Enviar sugestão
+              </Button>
+            </Col>
+            : null
+          }
+          <Col>
+            <Button color="#FFF" onClick={this.onBack.bind(this)}>Voltar</Button>
+          </Col>
+        </FormGroup>
+
+        <ModalSuggestion modal={this.state.modal} toggleModal={this.toggleModal.bind(this)} />
       </Fragment>
     )
   }

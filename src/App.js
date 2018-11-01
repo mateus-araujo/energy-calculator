@@ -9,6 +9,7 @@ import Header from './components/Header'
 import ArCondicionado from './equipments/ArCondicionado'
 import Geladeira from './equipments/Geladeira'
 import Televisao from './equipments/Televisao'
+import OtherEquip from './equipments/OtherEquip'
 import NotFound from './equipments/NotFound'
 
 import api from './services/api'
@@ -16,7 +17,7 @@ import './App.css'
 
 class App extends Component {
   state = {
-    equipments: ['Ar condicionado', 'Geladeira', 'Televisão'],
+    equipments: ['Ar condicionado', 'Geladeira', 'Televisão', 'Outro equipamento'],
     selectedEquip: '',
     dropdownOpen: false,
     comecar: false,
@@ -37,7 +38,6 @@ class App extends Component {
         (position) => {
           const { coords } = position
 
-          console.log(coords)
           this.createAccess(coords)
           // this.setState({ coords })
         }, (error) => {
@@ -56,16 +56,26 @@ class App extends Component {
     await api.post('/access', {
       accuracy, latitude, longitude
     })
-      .then(response => console.log(response.data))
   }
 
   createAccessWithoutCoords = async () => {
     await api.post('/access')
-      .then(response => console.log(response.data))
+  }
+
+  async onClickEquipment(equipment) {
+    this.setState({ selectedEquip: equipment })
+
+    await api.post('/equip_click', {
+      equip: equipment
+    })
   }
 
   toggleDropdown() {
     this.setState({ dropdownOpen: !this.state.dropdownOpen })
+  }
+
+  toogleComecar() {
+    this.setState({ comecar: !this.state.comecar })
   }
 
   render() {
@@ -73,7 +83,10 @@ class App extends Component {
       <div className="App">
         <Header />
         <div className="App-header">
-          <Card style={{ width: 400, color: '#333' }}>
+          <Card style={{
+            width: window.innerHeight > window.innerWidth ? '90%' : '30%',
+            color: '#333'
+          }}>
             <CardBody>
               {!this.state.comecar ?
                 <Form>
@@ -81,14 +94,14 @@ class App extends Component {
                     <Label style={{ marginBottom: 30, fontWeight: 'bold' }}>Escolha o equipamento: </Label>
                     <Col>
                       <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown.bind(this)}>
-                        <DropdownToggle caret color="info" style={{ inlineSize: 150 }}>
+                        <DropdownToggle caret color="info" style={{ inlineSize: 180 }}>
                           {this.state.selectedEquip}
                         </DropdownToggle>
                         <DropdownMenu>
                           {this.state.equipments.map(equipment =>
                             <DropdownItem
                               key={equipment}
-                              onClick={() => this.setState({ selectedEquip: equipment })}
+                              onClick={() => this.onClickEquipment(equipment)}
                             >
                               {equipment}
                             </DropdownItem>
@@ -103,12 +116,14 @@ class App extends Component {
                   </FormGroup>
                 </Form>
                 : this.state.selectedEquip === 'Geladeira' ?
-                  <Geladeira />
+                  <Geladeira comecar={this.toogleComecar.bind(this)} />
                   : this.state.selectedEquip === 'Ar condicionado' ?
-                    <ArCondicionado />
+                    <ArCondicionado comecar={this.toogleComecar.bind(this)} />
                     : this.state.selectedEquip === 'Televisão' ?
-                      <Televisao />
-                      : <NotFound />
+                      <Televisao comecar={this.toogleComecar.bind(this)} />
+                      : this.state.selectedEquip === 'Outro equipamento' ?
+                        <OtherEquip comecar={this.toogleComecar.bind(this)} />
+                        : <NotFound />
               }
             </CardBody>
           </Card>
