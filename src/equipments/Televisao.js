@@ -15,7 +15,7 @@ class Televisao extends Component {
   state = {
     tempo_uso: 6,
     potencia: 1000,
-    procel: ['A', 'B', 'C', 'D', 'E'],
+    procel: ['A', 'B', 'C', 'D', 'E', 'Não sei'],
     selectedProcel: '',
     dropdownProcel: false,
     aparelhos: [
