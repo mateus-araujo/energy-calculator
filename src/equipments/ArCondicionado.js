@@ -19,9 +19,12 @@ class ArCondicionado extends Component {
     selectedProcel: '',
     dropdownProcel: false,
     aparelhos: [
-      { descricao: '7500 Btu\'s', potencia: 650 },
-      { descricao: '9000 Btu\'s', potencia: 950 },
-      { descricao: '12000 Btu\'s', potencia: 1200 }
+      { descricao: '7.000 BTU/h', potencia: 900 },
+      { descricao: '10.000 BTU/h', potencia: 1400 },
+      { descricao: '12.000 BTU/h', potencia: 1600 },
+      { descricao: '18.000 BTU/h', potencia: 2600 },
+      { descricao: '21.000 BTU/h', potencia: 2800 },
+      { descricao: '30.000 BTU/h', potencia: 3600 },
     ],
     selectedAparelho: '',
     dropdownAparelhos: false,
@@ -132,7 +135,7 @@ class ArCondicionado extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup row>
+            {/* <FormGroup row>
               <Label size="sm" sm="7" xs="7">Potência em W (watts): </Label>
               <Col sm="5" xs="5">
                 <Input
@@ -143,7 +146,7 @@ class ArCondicionado extends Component {
                   value={this.state.potencia}
                 />
               </Col>
-            </FormGroup>
+            </FormGroup> */}
 
             <FormGroup row>
               <Label size="sm" sm="7" xs="7">Selo Procel: </Label>

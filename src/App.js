@@ -78,6 +78,21 @@ class App extends Component {
     this.setState({ comecar: !this.state.comecar })
   }
 
+  renderEquipment(equip) {
+    switch (equip) {
+      case 'Ar condicionado':
+        return <ArCondicionado comecar={this.toogleComecar.bind(this)} />
+      case 'Geladeira':
+        return <Geladeira comecar={this.toogleComecar.bind(this)} />
+      case 'Televisão':
+        return <Televisao comecar={this.toogleComecar.bind(this)} />
+      case 'Outro equipamento':
+        return <OtherEquip comecar={this.toogleComecar.bind(this)} />
+      default:
+        return <NotFound comecar={this.toogleComecar.bind(this)} />
+    }
+  }
+
   render() {
     return (
       <div className="App">
@@ -115,15 +130,7 @@ class App extends Component {
                     <Button color="success" onClick={() => this.setState({ comecar: true })}>Começar</Button>
                   </FormGroup>
                 </Form>
-                : this.state.selectedEquip === 'Geladeira' ?
-                  <Geladeira comecar={this.toogleComecar.bind(this)} />
-                  : this.state.selectedEquip === 'Ar condicionado' ?
-                    <ArCondicionado comecar={this.toogleComecar.bind(this)} />
-                    : this.state.selectedEquip === 'Televisão' ?
-                      <Televisao comecar={this.toogleComecar.bind(this)} />
-                      : this.state.selectedEquip === 'Outro equipamento' ?
-                        <OtherEquip comecar={this.toogleComecar.bind(this)} />
-                        : <NotFound />
+                : this.renderEquipment(this.state.selectedEquip)
               }
             </CardBody>
           </Card>
